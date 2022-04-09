@@ -1,6 +1,5 @@
 import random
-
-from numpy import size
+from operator import itemgetter
 
 #create Table
 def create_table(size_cromo, min, max,  bidirectional = True):
@@ -22,15 +21,17 @@ def create_table(size_cromo, min, max,  bidirectional = True):
 
     return table
 
+#Generate Population
+def gen_pop(size_pop, size_cromo):
+    return [(gen_indiv, 0) for i in range(size_pop)]
 
-#Generate Individuals
+#Generate Individual
 def gen_indiv(size_cromo):
     individual = [num for num in range(size_cromo)]
     random.shuffle(individual)
     return individual
 
 #Order Crossover
-
 def order_crossover(parent1, parent2, prob_crossover):
     
     if random.random() < prob_crossover:
@@ -61,7 +62,7 @@ def order_crossover(parent1, parent2, prob_crossover):
             j = fixed % length
             
             while cromo2[j] in child1:
-                j = (j + 1) % size
+                j = (j + 1) % length
             
             child1[pos] = cromo2[j]
             pos = (pos + 1) % length
@@ -72,7 +73,7 @@ def order_crossover(parent1, parent2, prob_crossover):
             j = fixed % length
             
             while cromo1[j] in child2:
-                j = (j + 1) % size
+                j = (j + 1) % length
             
             child2[pos] = cromo1[j]
             pos = (pos + 1) % length
@@ -108,9 +109,69 @@ def swap_mutation(cromo, prob_mutation):
 def fitness(individual):
     pass
 
-#tournament
+# Parents Selection: tournament
+def tour_sel(t_size):
+    def tournament(pop):
+        size_pop= len(pop)
+        mate_pool = []
+        for i in range(size_pop):
+            winner = one_tour(pop,t_size)
+            mate_pool.append(winner)
+        return mate_pool
+    return tournament
+
+def one_tour(population,size):
+    """Minimization Problem. Deterministic"""
+    pool = random.sample(population, size)
+    pool.sort(key=itemgetter(1), reverse=False)
+    return pool[0]
+
+def best_pop(populacao):
+    populacao.sort(key=itemgetter(1),reverse=False)
+    return populacao[0]
+
+#Survivors Selection
+
+def survivor_selection():
+    pass
+
 
 # Evolutionary Algorithm Random Immigrants
+def sea_ri(numb_generations,size_pop, size_cromo, prob_cross,sel_parents,crossover,mutation,sel_survivors, fitness_func):
+    
+    # inicialize population: indiv = (cromo,fit)
+    population = gen_pop(size_pop,size_cromo)
+
+    # evaluate population
+    population = [(indiv, fitness_func(indiv)) for indiv, fitness in populacao]
+
+    for gen in range(numb_generations):
+
+        # sparents selection
+        mate_pool = sel_parents(populacao)
+
+        # Variation
+        # ------ Crossover
+        progenitores = []
+        for i in  range(0,size_pop-1,2):
+            indiv_1= mate_pool[i]
+            indiv_2 = mate_pool[i+1]
+            filhos = crossover(indiv_1,indiv_2, prob_cross)
+            progenitores.extend(filhos) 
+
+        # ------ Mutation
+        descendentes = []
+        for cromo,fit in progenitores:
+            novo_cromo = mutation(cromo, size_cromo)
+            descendentes.append((novo_cromo,fitness_func(novo_cromo)))
+
+        # New population
+        populacao = sel_survivors(populacao,descendentes)
+
+        # Evaluate the new population
+        populacao = [(indiv[0], fitness_func(indiv[0])) for indiv in populacao]     
+
+    return best_pop(populacao)
 
 # Evolutionary Algorithm Multiple Populations
 
