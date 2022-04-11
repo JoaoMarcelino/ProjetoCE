@@ -2,8 +2,11 @@ from random import random, randint, seed, sample, choice, shuffle, randrange
 from math import sqrt
 from tqdm import tqdm
 from operator import itemgetter
+from utils import *
 
 # create Table
+
+
 def create_table(size_cromo, min, max,  bidirectional=True):
     table = [[0] * size_cromo for i in range(size_cromo)]
 
@@ -118,7 +121,6 @@ def fitness(genotype, cities, knownAnswer):
         totalDistance += distance(genotype[i], genotype[j], cities)
     return knownAnswer/totalDistance
 
-
 def distance(city1, city2, cities):
     x1, y1 = cities[city1]
     x2, y2 = cities[city2]
@@ -155,128 +157,140 @@ def survivalSelection(population, offsprings, elitRate):
     offsprings.sort(key=itemgetter(1), reverse=True)
     return population[0:elitSize]+offsprings[0:popSize-elitSize]
 
-def bestMigrantSelection(population,migrationRate):
-        popSize = len(population)
-        population = population.copy()
 
-        population.sort(key=itemgetter(1),reverse=True)
-        migrants = population[0:round(migrationRate*popSize)]
-        return migrants
+def bestMigrantSelection(population, migrationRate):
+    popSize = len(population)
+    population = population.copy()
 
-def worstMigrantReplacement(population,migrants):
-    population=population.copy()
+    population.sort(key=itemgetter(1), reverse=True)
+    migrants = population[0:round(migrationRate*popSize)]
+    return migrants
 
-    popSize=len(population)
-    migSize=len(migrants)
-    
-    population.sort(key=itemgetter(1),reverse=True)
-    population=population[0:popSize-migSize]+migrants
+
+def worstMigrantReplacement(population, migrants):
+    population = population.copy()
+
+    popSize = len(population)
+    migSize = len(migrants)
+
+    population.sort(key=itemgetter(1), reverse=True)
+    population = population[0:popSize-migSize]+migrants
     return population
 
 
 # Evolutionary Algorithm Random Immigrants
-def seaRI(nGenerations, popSize, genoSize, probCross,probMut,tournSize,elitRate,crossoverFunc,mutationFunc,parentSelectionFunc,survivalSelectionFuc,fitnessFunc,migrationInterval,migrationRate,migrantReplacementFunc,seedNumber,cities,knownAnswer):
-    stats={}
+def seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer):
+    stats = {}
     seed(seedNumber)
-    gensOfMigration=list(range(0,nGenerations,migrationInterval))
-    nImigrants=round(migrationRate*popSize)
-    
+    gensOfMigration = list(range(0, nGenerations, migrationInterval))
+    nImigrants = round(migrationRate*popSize)
+
     # inicialize population: indiv = (cromo,fit)
     population = generatePopulation(popSize, genoSize)
-    
-    # evaluate population
-    population = [(indiv, fitnessFunc(indiv,cities,knownAnswer)) for indiv, fitness in population]
-    stats[0]=[fit for genotype,fit in population]
 
+    # evaluate population
+    population = [(indiv, fitnessFunc(indiv, cities, knownAnswer))
+                  for indiv, fitness in population]
+    stats=updateStatistics(stats,population)
 
     for gen in tqdm(range(nGenerations)):
         # sparents selection
-        parents= parentSelectionFunc(population,tournSize)
-        offsprings=[]
-        #Crossover
+        parents = parentSelectionFunc(population, tournSize)
+        offsprings = []
+        # Crossover
         for i in range(0, popSize-1, 2):
             indiv_1 = parents[i]
             indiv_2 = parents[i+1]
             sons = crossoverFunc(indiv_1, indiv_2, probCross)
-            offsprings+=sons
-        #Mutation
-        for i,indiv in enumerate(offsprings):
-            newGeno=mutationFunc(indiv[0],probMut)
-            offsprings[i] =(newGeno,fitnessFunc(newGeno,cities,knownAnswer))
+            offsprings += sons
+        # Mutation
+        for i, indiv in enumerate(offsprings):
+            newGeno = mutationFunc(indiv[0], probMut)
+            offsprings[i] = (newGeno, fitnessFunc(
+                newGeno, cities, knownAnswer))
 
         # New population
-        population = survivalSelectionFuc(population, offsprings,elitRate)
-        
+        population = survivalSelectionFuc(population, offsprings, elitRate)
+
         if gen in gensOfMigration:
-            population=migrantReplacementFunc(population,generatePopulation(nImigrants, genoSize))
+            population = migrantReplacementFunc(
+                population, generatePopulation(nImigrants, genoSize))
 
-
-        population = [(indiv, fitnessFunc(indiv,cities,knownAnswer)) for indiv, fitness in population]
-        stats[gen+1]=[fit for genotype,fit in population]
+        population = [(indiv, fitnessFunc(indiv, cities, knownAnswer))
+                      for indiv, fitness in population]
+        stats=updateStatistics(stats,population)
     return stats
 
 # Evolutionary Algorithm Two Populations
-def seaDP(nGenerations, popSize, genoSize, probCross,probMut,tournSize,elitRate,crossoverFunc,mutationFunc,parentSelectionFunc,survivalSelectionFuc,fitnessFunc,migrationInterval,migrationRate,migrantReplacementFunc,migrantSelectionFunc,seedNumber,cities,knownAnswer):
-    stats={}
+
+
+def seaDP(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, migrantSelectionFunc, seedNumber, cities, knownAnswer):
+    stats = {}
     seed(seedNumber)
-    gensOfMigration=list(range(0,nGenerations,migrationInterval))
-    popSize=round(popSize/2)
-    nImigrants=round(migrationRate*popSize)
-    
-    
+    gensOfMigration = list(range(0, nGenerations, migrationInterval))
+    popSize = round(popSize/2)
+    nImigrants = round(migrationRate*popSize)
+
     # inicialize population: indiv = (cromo,fit)
     populations = [generatePopulation(popSize, genoSize) for i in range(2)]
 
     # evaluate population
-    populations = [[(indiv, fitnessFunc(indiv,cities,knownAnswer)) for indiv, fitness in population] for population in populations]
-    stats[0]=[fit for genotype,fit in populations[0]+populations[1]]
-
+    populations = [[(indiv, fitnessFunc(indiv, cities, knownAnswer))
+                    for indiv, fitness in population] for population in populations]
+    stats=updateStatistics(stats,populations[0]+populations[1])
 
     for gen in tqdm(range(nGenerations)):
-        for k,population in enumerate(populations):
+        for k, population in enumerate(populations):
             # sparents selection
-            parents= parentSelectionFunc(population,tournSize)
-            offsprings=[]
-            #Crossover
+            parents = parentSelectionFunc(population, tournSize)
+            offsprings = []
+            # Crossover
             for i in range(0, popSize-1, 2):
                 indiv_1 = parents[i]
                 indiv_2 = parents[i+1]
                 sons = crossoverFunc(indiv_1, indiv_2, probCross)
-                offsprings+=sons
-            #Mutation
-            for i,indiv in enumerate(offsprings):
-                newGeno=mutationFunc(indiv[0],probMut)
-                offsprings[i] =(newGeno,fitnessFunc(newGeno,cities,knownAnswer))
+                offsprings += sons
+            # Mutation
+            for i, indiv in enumerate(offsprings):
+                newGeno = mutationFunc(indiv[0], probMut)
+                offsprings[i] = (newGeno, fitnessFunc(
+                    newGeno, cities, knownAnswer))
 
             # New population
 
-            population = survivalSelectionFuc(population, offsprings,elitRate)
-            population = [(indiv, fitnessFunc(indiv,cities,knownAnswer)) for indiv, fitness in population]
-            populations[k]=population
+            population = survivalSelectionFuc(population, offsprings, elitRate)
+            population = [(indiv, fitnessFunc(indiv, cities, knownAnswer))
+                          for indiv, fitness in population]
+            populations[k] = population
 
         if gen in gensOfMigration:
-            migrants=[migrantSelectionFunc(population,migrationRate) for population in populations]
-            populations[0]=migrantReplacementFunc(populations[0],migrants[1])
-            populations[1]=migrantReplacementFunc(populations[1],migrants[0])
+            migrants = [migrantSelectionFunc(
+                population, migrationRate) for population in populations]
+            populations[0] = migrantReplacementFunc(
+                populations[0], migrants[1])
+            populations[1] = migrantReplacementFunc(
+                populations[1], migrants[0])
 
-
-        populations = [[(indiv, fitnessFunc(indiv,cities,knownAnswer)) for indiv, fitness in population] for population in populations]
-        stats[gen+1]=[fit for genotype,fit in populations[0]+populations[1]]
+        populations = [[(indiv, fitnessFunc(indiv, cities, knownAnswer))
+                        for indiv, fitness in population] for population in populations]
+        stats=updateStatistics(stats,populations[0]+populations[1])
     return stats
 
+
 if __name__ == "__main__":
+
     datasetFileName = './berlin52.tsp'
     cities = readDataset(datasetFileName)
-    knownAnswer=7544.3
-    nGenerations = 400
-    popSize = 200
+    knownAnswer = 7544.3
+    nGenerations = 200
+    popSize = 100
     genoSize = len(cities.keys())
     probMut = 0.05
     probCross = 0.9
     tournSize = 3
     elitRate = 0.05
-    migrationRate = 0.2
-    migrationInterval = 10
+    migrationRate = 0.05
+    migrationInterval = 20
     seedNumber = 1
 
     fitnessFunc = fitness
@@ -287,5 +301,7 @@ if __name__ == "__main__":
     survivalSelectionFuc = survivalSelection
     migrantReplacementFunc = worstMigrantReplacement
 
-    results = seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer)
-    print(results[nGenerations])
+    results = seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc,
+                    survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer)
+    plotStatistics(results)
+    writeStatisticsToFile(results,"./results/run1.json")
