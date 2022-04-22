@@ -1,0 +1,30 @@
+dataset = berlin52.tsp
+nGenerations = 200
+popSize = 100
+genoSize = 52
+probMut = 0.05
+probCross = 0.9
+tournSize = 3
+elitRate = 0.05
+
+Teste 1 - Dupla populacao
+    politica substituição migração= worst
+    politica seleção migração = best
+    Valores migration intervals (nº geracoes) -> [5, 10, 20, 40, 100]
+    Valores migration rate (percentagem da populacao que migra) -> [0.05, 0.2, 0.5, 0.8]
+    Para cada combinacao, testar com 30 seeds diferentes
+    Analise estatistica ou a olho e escolher melhor combinacao
+
+Teste 2 - Imigrantes Aleatorios
+    politica substituição migração= worst
+    politica seleção migração = random
+    Valores migration intervals (nº geracoes) -> [5, 10, 20, 40, 100]
+    Valores migration rate (percentagem da populacao que migra) -> [0.05, 0.2, 0.5, 0.8]
+    Para cada combinacao, testar com 10 ou 20 seeds diferentes
+    Para cada combinacao, testar com 30 seeds diferentes
+    Analise estatistica ou a olho e escolher melhor combinacao
+
+Teste Final - Comparação algoritmos
+    Fixar os parametros de cada algoritmo escolhidos nos testes anteriores
+    Testar cada algoritmo com 30,50 ou 100 seeds diferentes (consoante tempo disponivel)
+    Fazer analize estatistica

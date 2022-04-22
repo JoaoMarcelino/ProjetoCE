@@ -300,8 +300,10 @@ if __name__ == "__main__":
     parentSelectionFunc = tournamentSelection
     survivalSelectionFuc = survivalSelection
     migrantReplacementFunc = worstMigrantReplacement
-
-    results = seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc,
-                    survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer)
+    migrantSelectionFunc= bestMigrantSelection
+    
+    results = seaDP(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, migrantSelectionFunc, seedNumber, cities, knownAnswer)
     plotStatistics(results)
     writeStatisticsToFile(results,"./results/run1.json")
+
+    

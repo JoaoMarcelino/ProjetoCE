@@ -43,8 +43,76 @@ def readStatisticsToFile(targetFile):
 
 def plotStatistics(stats):
     gens=list(range(len(stats['average'])))
-    plt.plot(gens,stats['average'],label='Average')
-    plt.plot(gens,stats['best'],label='Best')
+    plt.plot(gens,stats['average'],label='Average Fit.')
+    plt.plot(gens,stats['best'],label='Best Fit.')
     plt.plot(gens,np.array(stats['diversity'])/6,label='Diversity/6')
+    plt.xlabel("Generations")
     plt.legend()
     plt.show()
+
+def plotMultipleStatistics(statsArray):
+    best=[]
+    average=[]
+    diversity=[]
+
+    for stat in statsArray:
+        best.append(stat['best'])
+        average.append(stat['average'])
+        diversity.append(stat['diversity'])
+
+    best=np.average(np.array(best),axis=0)
+    average=np.average(np.array(average),axis=0)
+    diversity=np.average(np.array(diversity),axis=0)
+    
+    gens=list(range(len(average)))
+    plt.plot(gens,average,label='Average Fit.')
+    plt.plot(gens,best,label='Best Fit.')
+    plt.plot(gens,diversity/6,label='Diversity/6')
+    plt.xlabel("Generations")
+    plt.legend()
+    plt.show()
+
+def plotStatisticsDiferentParameters(statsArray,metricName,parametersValues):
+    metric=[]
+
+    for stats in statsArray:
+        metricSpecificParam=[]
+        for run in stats:
+            metricSpecificParam.append(run[metricName])
+        metricSpecificParam=np.average(np.array(metricSpecificParam),axis=0)
+        metric.append(metricSpecificParam)
+        
+    
+    for i,metricSpecificParam in enumerate(metric):
+        gens=list(range(len(metricSpecificParam)))
+        plt.plot(gens,metricSpecificParam,label='{}'.format(parametersValues[i]))
+    plt.xlabel("Generations")
+    plt.legend()
+    plt.show()
+
+def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title):
+    stats=np.array(stats)
+    fig=plt.figure()
+    plt.clf()
+    ax=fig.add_subplot(111)
+    ax.set_aspect(1)
+    res=ax.imshow(stats,cmap=plt.cm.jet,interpolation='nearest')
+    height,width=stats.shape
+    print(height)
+    print(width)
+    for x in range(width):
+        for y in range(height):
+            ax.annotate(str(round(stats[y][x],3)), xy=(x, y), 
+                        horizontalalignment='center',
+                        verticalalignment='center')
+    
+    cb = fig.colorbar(res)
+    plt.xticks(range(width), colNames)
+    plt.yticks(range(height), rowNames)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
+
+
+
