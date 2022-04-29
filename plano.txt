@@ -20,7 +20,6 @@ Teste 2 - Imigrantes Aleatorios
     politica seleção migração = random
     Valores migration intervals (nº geracoes) -> [5, 10, 20, 40, 100]
     Valores migration rate (percentagem da populacao que migra) -> [0.05, 0.2, 0.5, 0.8]
-    Para cada combinacao, testar com 10 ou 20 seeds diferentes
     Para cada combinacao, testar com 30 seeds diferentes
     Analise estatistica ou a olho e escolher melhor combinacao
 

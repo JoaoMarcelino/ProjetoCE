@@ -98,8 +98,6 @@ def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title):
     ax.set_aspect(1)
     res=ax.imshow(stats,cmap=plt.cm.jet,interpolation='nearest')
     height,width=stats.shape
-    print(height)
-    print(width)
     for x in range(width):
         for y in range(height):
             ax.annotate(str(round(stats[y][x],3)), xy=(x, y), 
