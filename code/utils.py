@@ -49,7 +49,7 @@ def plotStatistics(stats):
     plt.xlabel("Generations")
     plt.legend()
     plt.show()
-
+    
 def plotMultipleStatistics(statsArray):
     best=[]
     average=[]
@@ -72,7 +72,7 @@ def plotMultipleStatistics(statsArray):
     plt.legend()
     plt.show()
 
-def plotStatisticsDiferentParameters(statsArray,metricName,parametersValues):
+def plotStatisticsDiferentParameters(statsArray,metricName,parametersValues, name):
     metric=[]
 
     for stats in statsArray:
@@ -88,9 +88,10 @@ def plotStatisticsDiferentParameters(statsArray,metricName,parametersValues):
         plt.plot(gens,metricSpecificParam,label='{}'.format(parametersValues[i]))
     plt.xlabel("Generations")
     plt.legend()
-    plt.show()
+    #plt.show()
+    plt.savefig(f"./plots/{name}/statistics.png")
 
-def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title):
+def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title,name):
     stats=np.array(stats)
     fig=plt.figure()
     plt.clf()
@@ -111,6 +112,7 @@ def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title):
     plt.ylabel(ylabel)
     plt.title(title)
     plt.show()
+    plt.savefig(f"./plots/{name}/matrix.png")
 
 
 
