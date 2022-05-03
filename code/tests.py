@@ -103,6 +103,7 @@ def test2():
     probCross = 0.9
     tournSize = 3
     elitRate = 0.05
+    seed = 50
     #migrationRate = 0.05
     #migrationInterval = 20
     #seedNumber = 1
@@ -118,7 +119,7 @@ def test2():
     i=0
     for migrationRate in [0.8]: #[0.05, 0.2, 0.5, 0.8]:
         for migrationInterval in [5]:#[5, 10, 20, 40, 100]:
-            for seedNumber in range(30):
+            for seedNumber in range(seed):
                 results = seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer)
                 results["migrationRate"]=migrationRate
                 results["migrationInterval"]=migrationInterval
@@ -131,7 +132,7 @@ def test2():
     for migrationRate in [0.8] : #[0.05, 0.2, 0.5, 0.8]:
         for migrationInterval in  [5]: #[5, 10, 20, 40, 100]:
             runs=[]
-            for k in range(30):
+            for k in range(seed):
                 runs.append(readStatisticsToFile(path + "results/{}/run{}.json".format(testName,i)))
                 i+=1
             results.append(runs)
@@ -152,7 +153,7 @@ def test2():
         row=[]
         for migrationInterval in [5]: # [5, 10, 20, 40, 100]
             runs=[]
-            for k in range(30):
+            for k in range(seed):
                 runs.append(readStatisticsToFile(path +  "results/{}/run{}.json".format(testName,i))[metric][-1])
                 i+=1
             row.append(np.average(np.array(runs)))
