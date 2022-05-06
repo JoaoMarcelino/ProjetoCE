@@ -18,6 +18,49 @@ def test_table(size, min, max):
     for i, row in enumerate(table):
         print(row)
 
+def test0():
+    testName="test0"
+    """
+    datasetFileName = './berlin52.tsp'
+    cities = readDataset(datasetFileName)
+    knownAnswer = 7544.3
+    nGenerations = 2000
+    #popSize = 100
+    genoSize = len(cities.keys())
+    probMut = 0.05
+    probCross = 0.9
+    tournSize = 3
+    elitRate = 0.05
+    migrationRate = 0.01
+    migrationInterval = 20000
+    seedNumber = 1
+
+    fitnessFunc = fitness
+    crossoverFunc = orderCrossover
+    mutationFunc = swapMutation
+
+    parentSelectionFunc = tournamentSelection
+    survivalSelectionFuc = survivalSelection
+    migrantReplacementFunc = worstMigrantReplacement
+    migrantSelectionFunc= bestMigrantSelection
+    
+    i=0
+    for popSize in [50,100,200,400]:
+        results = seaRI(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, seedNumber, cities, knownAnswer)
+        results["migrationRate"]=migrationRate
+        results["migrationInterval"]=migrationInterval
+        results["seedNumber"]=seedNumber
+        writeStatisticsToFile(results,"./results/{}/run{}.json".format(testName,i))
+        i+=1
+    """
+    i=0
+    results=[]
+    for popSize in [50,100,200,400]:
+        results.append(readStatisticsToFile("./results/{}/run{}.json".format(testName,i)))
+        i+=1
+
+    plotMultipleRuns(results, 'best', ["50","100","200","400"])
+
 def test1():
     """
     datasetFileName = './berlin52.tsp'
@@ -161,5 +204,40 @@ def test2():
         results.append(row)
 
     plotMatrix(results, rowNames, colNames,xlabel,ylabel,title)
+
+def test3():
+    testName="test3DP"
+    datasetFileName = './berlin52.tsp'
+    cities = readDataset(datasetFileName)
+    knownAnswer = 7544.3
+    nGenerations = 500
+    popSize = 500
+    genoSize = len(cities.keys())
+    probMut = 0.05
+    probCross = 0.9
+    tournSize = 3
+    elitRate = 0.05
+    migrationRate = 0.05
+    migrationInterval = 10
+    #seedNumber = 1
+
+    fitnessFunc = fitness
+    crossoverFunc = orderCrossover
+    mutationFunc = swapMutation
+
+    parentSelectionFunc = tournamentSelection
+    survivalSelectionFuc = survivalSelection
+    migrantReplacementFunc = worstMigrantReplacement
+    migrantSelectionFunc= bestMigrantSelection
+    
+    i=0
+    for seedNumber in range(50):
+        results = seaDP(nGenerations, popSize, genoSize, probCross, probMut, tournSize, elitRate, crossoverFunc, mutationFunc, parentSelectionFunc, survivalSelectionFuc, fitnessFunc, migrationInterval, migrationRate, migrantReplacementFunc, migrantSelectionFunc, seedNumber, cities, knownAnswer)
+        results["migrationRate"]=migrationRate
+        results["migrationInterval"]=migrationInterval
+        results["seedNumber"]=seedNumber
+        writeStatisticsToFile(results,"./results/{}/run{}.json".format(testName,i))
+        i+=1
+
 if __name__=="__main__":
-    test2()
+    test3()

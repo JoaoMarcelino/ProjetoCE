@@ -113,4 +113,14 @@ def plotMatrix(stats,rowNames,colNames,xlabel,ylabel,title):
     plt.show()
 
 
+def plotMultipleRuns(runs,metric,labels):
+    gens=list(range(len(runs[0]['average'])))
+
+    for i,stat in enumerate(runs):
+        plt.plot(gens,stat[metric],label=labels[i])
+    plt.xlabel("Generations")
+    plt.legend()
+    plt.show()
+
+
 
