@@ -302,8 +302,8 @@ def main():
         existsNormality = test_normality(data)
         if not existsNormality:
             print("We reject the null hypothesis - distribution not normal/guassian")
-            #wilcoxon
-            return 
+
+            return wilcoxon(dataset[0], dataset[1])
 
     print("We fail to reject the null hypothesis - distribution normal/guassian")
     #t_test_dep
