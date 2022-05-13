@@ -46,17 +46,19 @@ def describe_data(data):
     return (min_,max_,mean_,median_,mode_,var_,std_,skew_,kurtosis_,q_25,q_50,q_75)
 
 # visualizing data
-def histogram(data,title,xlabel,ylabel,bins=25):
+def histogram(data,title,xlabel,ylabel,bins=25, label=''):
     sns.set()
-    plt.hist(data,bins=bins)
+    plt.hist(data,bins=bins, range=(0.5,1), alpha=0.6, label=label)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.show()
+    #plt.show()
+    plt.legend()
+    plt.savefig(f"./plots/hipothesis/{title}.png")
     
 def histogram_with_normal(data,title,xlabel,ylabel,bins=25):
     sns.set()
-    plt.hist(data,bins=bins,density=True,alpha=0.6)
+    plt.hist(data, range=(0.5,1),bins=bins,density=True,alpha=0.6)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -66,12 +68,16 @@ def histogram_with_normal(data,title,xlabel,ylabel,bins=25):
     x = np.linspace(xmin, xmax, 1000)
     p = st.norm.pdf(x, mu, std)
     plt.plot(x, p, 'k', linewidth=2)
-    plt.show()
     
-def box_plot(data, labels):
+    #plt.show()
+    plt.savefig(f"./plots/hipothesis/{title}.png")
+    
+def box_plot(data,title,labels):
     sns.set()
+    plt.title(title)
     plt.boxplot(data,labels=labels)
-    plt.show()
+    #plt.show()
+    plt.savefig(f"./plots/hipothesis/{title}.png")
 
 
 # Parametric??
@@ -284,6 +290,7 @@ def main():
         fitness = json['bestIndiv'][1]
         data.append(fitness)
     
+    histogram(data, "histogram_DP", 'x', 'y',  label='DP')
     dataset.append(data)
     #RI
     folder = 'test3RI'
@@ -294,7 +301,17 @@ def main():
         fitness = json['bestIndiv'][1]
         data.append(fitness)
 
+
+
+    histogram(data, "histogram_DP_RI", 'x', 'y', label='RI')
+    plt.figure()
+    histogram(data, "histogram_RI", 'x', 'y', label='RI')
+
     dataset.append(data)
+
+    plt.figure()
+    box_plot(dataset, "boxplot", ['DP', 'RI'])
+
 
     #Test Normality
 
@@ -303,14 +320,25 @@ def main():
         if not existsNormality:
             print("We reject the null hypothesis - distribution not normal/guassian")
 
-            return wilcoxon(dataset[0], dataset[1])
+
+            print(f"DP - {np.mean(dataset[0])} - {np.std(dataset[0])}")
+            print(f"RI - {np.mean(dataset[1])} - {np.std(dataset[1])}")
+
+
+            print(wilcoxon(dataset[0], dataset[1]))
+
+
+
+            return
 
     print("We fail to reject the null hypothesis - distribution normal/guassian")
     #t_test_dep
 
     return 
 
+
 if __name__ == "__main__":
+
     main()
 
 
@@ -429,22 +457,6 @@ def display_dep_anova(data_frame,f,p_val):
     else:
         print('Cannot reject the null hypothesis. [95%]')    
      
-if __name__ == '__main__':
-    filename_1 = 'pulse_rate.txt'
-    #main_1111(filename_1)
-    #main_1(filename_1)
-    #main_11(filename_1)
-    #main_111(filename_1)
-    filename_2 = 'spider.txt'
-    #main_levene(filename_2)
-    #main_2(filename_2)
-    #main_22(filename_2)
-    #main_222(filename_2)
-    filename_3 = 'sphere.txt'
-    #main_3(filename_3)
-    #main_33(filename_3)
-    #main_dep_anova()
-    
 
     
  
